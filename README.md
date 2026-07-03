@@ -2,13 +2,15 @@
 
 An enterprise-grade, deterministic ATS (Applicant Tracking System) Resume Checker. This platform analyzes a candidate's resume against a job description, scores it transparently based on strict rules, and uses AI (Google Gemini) to provide qualitative grammar and bullet point rewriting suggestions.
 
-## Philosophy
+## Philosophy & Architecture
 
-The architecture of this project strictly follows a **Deterministic Engine First** philosophy:
+The architecture of this project strictly follows a **Deterministic Engine First** philosophy, isolating AI from the core grading mechanics to ensure 100% reproducible and trustworthy evaluations:
+
 1. **Parser Engine**: Extracts text using robust regex and heuristics (no LLM hallucination).
-2. **Keyword Engine**: Uses natural language processing (`natural` Porter Stemmer) for deterministic keyword matching.
-3. **Scoring Engine**: Calculates the 100-point ATS score using strict, transparent deductions.
-4. **AI Suggestions**: Google Gemini operates entirely in parallel to analyze grammar and rewrite bullets. It has **no** influence over the ATS score.
+2. **JD Intelligence Engine**: A deterministic heuristic parser that scans Job Descriptions, mapping extracted keywords to **Required (70%)**, **Preferred (20%)**, and **Bonus (10%)** weighted classifications.
+3. **8-Category ATS Scoring Engine**: Calculates the 100-point ATS Match score using a massive set of mathematically clamped rules evaluating Formatting (20), Keywords (25), Experience (15), Projects (10), Skills (10), Education (5), Grammar (5), and ATS Compatibility (10).
+4. **Recruiter Confidence Simulator**: Calculates a separate, secondary 100-point metric simulating how a human recruiter would perceive the candidate based purely on impact metrics, technical match, and leadership signals (ignoring ATS mechanics).
+5. **AI Suggestions**: Google Gemini operates entirely in parallel to analyze grammar and rewrite bullets. It has **no** influence over the ATS score or Recruiter Confidence score.
 
 ## Architecture & Tech Stack
 

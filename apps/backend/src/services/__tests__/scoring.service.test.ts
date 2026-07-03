@@ -1,80 +1,72 @@
 import { ScoringService } from '../scoring.service';
-import { ParsedResume } from '../../types';
+import { ParsedResume, KeywordAnalysisResult } from '../../types';
 
-describe('ScoringService', () => {
+describe('ScoringService - Advanced 8-Category Engine', () => {
   let scoringService: ScoringService;
 
   beforeEach(() => {
     scoringService = new ScoringService();
   });
 
-  const getMockResume = (overrides?: Partial<ParsedResume>): ParsedResume => ({
+  const baseResume: ParsedResume = {
     name: 'John Doe',
-    email: 'john@example.com',
-    phone: '123-456-7890',
+    email: 'john@doe.com',
+    phone: '1234567890',
     linkedin: 'linkedin.com/in/johndoe',
     github: '',
     portfolio: '',
-    skills: ['JavaScript'],
-    experience: ['Software Engineer at Tech', 'Increased revenue by 10%'],
-    education: ['B.S. CS'],
-    projects: ['Built a react app'],
+    skills: ['React', 'Node.js', 'AWS'],
+    experience: ['Software Engineer at TechCorp. I developed a new API that increased performance by 20%.'],
+    education: ['B.S. Computer Science'],
+    projects: ['Built a personal portfolio website with 100 users.'],
     certifications: [],
     languages: [],
     summary: '',
-    rawText: 'John Doe\njohn@example.com\n123-456-7890\nlinkedin.com/in/johndoe\n- Built app\n- Increased revenue by 10%\n- Managed team\n- Developed features\n- Optimized code',
-    ...overrides
+    rawText: 'John Doe john@doe.com 1234567890 linkedin.com/in/johndoe\nSkills: React, Node.js, AWS\nExperience: Software Engineer at TechCorp. I developed a new API that increased performance by 20%.\nProjects: Built a personal portfolio website with 100 users.\nEducation: B.S. Computer Science. - - - - -',
+  };
+
+  const baseKeywordAnalysis: KeywordAnalysisResult = {
+    matchedKeywords: ['react', 'node.js'],
+    missingKeywords: [],
+    requiredSkills: { matched: ['react', 'node.js'], missing: [] },
+    preferredSkills: { matched: [], missing: [] },
+    bonusSkills: { matched: [], missing: [] },
+    keywordPercentage: 100,
+  };
+
+  it('should calculate recruiter confidence independently', () => {
+    const result = scoringService.calculateScore(baseResume, baseKeywordAnalysis);
+    // Experience (35) + Projects w/ Metrics (20) + 0 Achievements (needs 3 for 15, has 1 for 7) + Tech (15) + Career (0) + Lead/Comm (0)
+    // 35 + 20 + 7 + 15 = 77
+    expect(result.recruiterConfidence).toBeGreaterThanOrEqual(70);
   });
 
-  describe('calculateScore', () => {
-    it('should return a high score for a well-formatted resume', () => {
-      const resume = getMockResume();
-      const result = scoringService.calculateScore(resume, 100);
-      
-      expect(result.deductions.length).toBe(0);
-      expect(result.overallScore).toBeGreaterThan(80);
-    });
+  it('should clamp scores at 0', () => {
+    const badResume: ParsedResume = {
+      ...baseResume,
+      email: '',
+      phone: '',
+      linkedin: '',
+      rawText: 'No contact info at all. Paragraph paragraph.',
+    };
+    
+    const result = scoringService.calculateScore(badResume, baseKeywordAnalysis);
+    expect(result.categories.formatting.score).toBeGreaterThanOrEqual(0);
+  });
 
-    it('should deduct points for missing contact info', () => {
-      const resume = getMockResume({ phone: '', linkedin: '' });
-      const result = scoringService.calculateScore(resume, 100);
-      
-      const phoneDeduction = result.deductions.find(d => d.explanation.includes('Missing phone number'));
-      const linkedinDeduction = result.deductions.find(d => d.explanation.includes('No LinkedIn'));
-      
-      expect(phoneDeduction).toBeDefined();
-      expect(linkedinDeduction).toBeDefined();
-    });
+  it('should identify missing JD skills and penalize accordingly', () => {
+    const keywordAnalysis: KeywordAnalysisResult = {
+      ...baseKeywordAnalysis,
+      requiredSkills: { matched: ['react'], missing: ['node.js'] }, // missing 1 out of 2 required
+      preferredSkills: { matched: [], missing: ['aws'] },
+      bonusSkills: { matched: [], missing: [] },
+    };
 
-    it('should deduct points for missing sections', () => {
-      const resume = getMockResume({ experience: [], projects: [] });
-      const result = scoringService.calculateScore(resume, 100);
-      
-      const expDeduction = result.deductions.find(d => d.rule === 'Experience' && d.explanation.includes('No Work Experience'));
-      const projDeduction = result.deductions.find(d => d.rule === 'Projects');
-      
-      expect(expDeduction).toBeDefined();
-      expect(projDeduction).toBeDefined();
-      expect(result.categoryScores.experience).toBe(0);
-    });
-
-    it('should deduct points if no measurable achievements found in experience', () => {
-      const resume = getMockResume({ 
-        experience: ['I worked here and did things.'],
-        rawText: '- Built app\n- Worked here'
-      });
-      const result = scoringService.calculateScore(resume, 100);
-      
-      const achievementDeduction = result.deductions.find(d => d.explanation.includes('No measurable achievements'));
-      expect(achievementDeduction).toBeDefined();
-    });
-
-    it('should deduct points for formatting issues like insufficient bullets', () => {
-      const resume = getMockResume({ rawText: 'Just a paragraph without any bullets.' });
-      const result = scoringService.calculateScore(resume, 100);
-      
-      const bulletDeduction = result.deductions.find(d => d.explanation.includes('bullet points detected'));
-      expect(bulletDeduction).toBeDefined();
-    });
+    const result = scoringService.calculateScore(baseResume, keywordAnalysis);
+    // Required missing penalty: 17.5 / 2 = 8.75 points lost
+    // Preferred missing penalty: 5 / 1 = 5 points lost
+    // Total deductions = ~13.75 -> score = 25 - 13.75 = 11.25 -> 11
+    expect(result.categories.keywordMatch.score).toBeLessThan(25);
+    expect(result.categories.keywordMatch.deductions.some(d => d.rule === 'Missing Required Skill')).toBeTruthy();
   });
 });

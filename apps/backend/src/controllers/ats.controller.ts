@@ -51,7 +51,7 @@ export class AtsController {
       const keywordAnalysis = keywordService.analyzeKeywords(parsedResume, jobDescription);
 
       // Deterministic Scoring
-      const scoringResult = scoringService.calculateScore(parsedResume, keywordAnalysis.keywordPercentage);
+      const scoringResult = scoringService.calculateScore(parsedResume, keywordAnalysis);
 
       // AI Suggestions
       const aiSuggestions = await geminiService.getSuggestions(parsedResume);
@@ -60,17 +60,12 @@ export class AtsController {
         success: true,
         data: {
           overallScore: scoringResult.overallScore,
-          categoryScores: scoringResult.categoryScores,
+          matchBenchmark: scoringResult.matchBenchmark,
+          recruiterConfidence: scoringResult.recruiterConfidence,
+          categories: scoringResult.categories,
+          keywordAnalysis,
           resume: parsedResume,
-          matchedKeywords: keywordAnalysis.matchedKeywords,
-          missingKeywords: keywordAnalysis.missingKeywords,
-          technicalSkills: keywordAnalysis.technicalSkills,
-          softSkills: keywordAnalysis.softSkills,
-          warnings: scoringResult.warnings || [],
-          strengths: scoringResult.strengths,
-          improvements: [],
           aiSuggestions,
-          deductions: scoringResult.deductions,
         }
       };
 
