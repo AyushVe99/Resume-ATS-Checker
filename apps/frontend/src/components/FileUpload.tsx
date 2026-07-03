@@ -58,13 +58,14 @@ export default function FileUpload() {
       const formData = new FormData();
       formData.append('resume', values.file as File);
       
-      const uploadRes = await axios.post('http://localhost:5000/api/upload', formData, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const uploadRes = await axios.post(`${API_URL}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
       const parsedResume = uploadRes.data.data;
 
-      const analysisRes = await axios.post('http://localhost:5000/api/analyze', {
+      const analysisRes = await axios.post(`${API_URL}/analyze`, {
         jobDescription: values.jobDescription,
         parsedResume,
       });
