@@ -16,7 +16,7 @@ The architecture of this project strictly follows a **Deterministic Engine First
 
 This project is a Monorepo managed via npm workspaces.
 
-- **Frontend (`apps/frontend`)**: Next.js 15+, React, Tailwind CSS, Shadcn UI, Mantine Form, Zustand state management.
+- **Frontend (`apps/frontend`)**: Next.js 16, React 19, Tailwind CSS, Shadcn UI, Mantine Form, Zustand state management.
 - **Backend (`apps/backend`)**: Node.js, Express, TypeScript, Multer (Memory Storage), Jest.
 - **AI Integration**: `@google/genai` (Gemini 2.5 Flash).
 - **Security**: `helmet`, `express-rate-limit`, exponential backoff with AbortControllers.
