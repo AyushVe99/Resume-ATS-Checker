@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc && cp -r src/generated dist/generated",
-    "start": "node dist/server.js",
+    "start": "npx prisma db push --accept-data-loss && node dist/server.js",
     "test": "jest"
   },
   "keywords": [],
