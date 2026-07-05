@@ -1,0 +1,59 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint Frontend
+        run: npm run lint --workspace=apps/frontend
+
+      - name: Build Frontend
+        run: npm run build --workspace=apps/frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:5000/api
+
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=apps/backend/prisma/schema.prisma
+
+      - name: Build Backend
+        run: npm run build --workspace=apps/backend
+
+      - name: Test Backend
+        run: npm run test --workspace=apps/backend
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/ats_db?schema=public"
+          GEMINI_API_KEY: "dummy"
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Trigger Render Deployment
+        run: |
+          if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            curl -X POST -d '' "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+            echo "Render deployment triggered successfully."
+          else
+            echo "RENDER_DEPLOY_HOOK_URL secret is not set. Please add it to your GitHub Repository Secrets."
+            echo "Without this secret, Render will not deploy automatically upon CI completion."
+            exit 1
+          fi
