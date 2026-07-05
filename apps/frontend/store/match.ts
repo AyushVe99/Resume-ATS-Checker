@@ -1,9 +1,17 @@
 import { create } from 'zustand';
 
+export interface AnalysisResult {
+  resume?: {
+    resumeId?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
 interface MatchState {
-  analysisResult: Record<string, unknown> | null;
+  analysisResult: AnalysisResult | null;
   isAnalyzing: boolean;
-  setAnalysisResult: (result: Record<string, unknown> | null) => void;
+  setAnalysisResult: (result: AnalysisResult | null) => void;
   setIsAnalyzing: (analyzing: boolean) => void;
 }
 

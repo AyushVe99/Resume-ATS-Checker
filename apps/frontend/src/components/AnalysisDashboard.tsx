@@ -104,14 +104,16 @@ export default function AnalysisDashboard() {
 
   if (!analysisResult) return null;
 
-  const {
-    overallScore,
-    matchBenchmark,
-    recruiterConfidence,
-    categories,
-    keywordAnalysis,
-    aiSuggestions,
-  } = analysisResult;
+  const overallScore = analysisResult.overallScore as number;
+  const matchBenchmark = analysisResult.matchBenchmark as string;
+  const recruiterConfidence = analysisResult.recruiterConfidence as number;
+  const categories = analysisResult.categories as Record<string, CategoryData>;
+  const keywordAnalysis = analysisResult.keywordAnalysis as {
+    requiredSkills?: { matched: string[]; missing: string[] };
+    preferredSkills?: { matched: string[]; missing: string[] };
+    bonusSkills?: { matched: string[]; missing: string[] };
+  };
+  const aiSuggestions = analysisResult.aiSuggestions as Array<{ section: string; suggestion: string; reason: string }>;
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-500';

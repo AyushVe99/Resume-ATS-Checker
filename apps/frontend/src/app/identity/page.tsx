@@ -27,7 +27,7 @@ export default function IdentityPage() {
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
         const res = await axios.post(`${API_URL}/intelligence/identity`, {
-          resumeId: analysisResult.resume.resumeId
+          resumeId: analysisResult?.resume?.resumeId
         });
         setIdentityData(res.data.data);
       } catch (err) {
@@ -67,10 +67,10 @@ export default function IdentityPage() {
       
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         <EngineeringDNA data={identityData} />
-        <ComplexityMatrix data={identityData.projects} />
+        <ComplexityMatrix data={identityData.projects || []} />
       </div>
 
-      <EvidenceTimeline data={identityData.timeline} />
+      <EvidenceTimeline data={identityData.timeline || []} />
     </div>
   );
 }

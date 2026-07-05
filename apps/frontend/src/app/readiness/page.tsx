@@ -28,7 +28,7 @@ export default function ReadinessPage() {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
       const res = await axios.post(`${API_URL}/intelligence/readiness`, {
-        resumeId: analysisResult.resume.resumeId,
+        resumeId: analysisResult?.resume?.resumeId,
         targetRoleTitle: roleInput
       });
       setReadinessData(res.data.data.readiness);
@@ -92,7 +92,7 @@ export default function ReadinessPage() {
       </div>
       
       <div className="grid lg:grid-cols-2 gap-8">
-        <RiskMap data={readinessData.riskMap} />
+        <RiskMap data={readinessData.riskMap || []} />
         <ReadinessTree data={readinessData} />
       </div>
     </div>
