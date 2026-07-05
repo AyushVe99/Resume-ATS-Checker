@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import '@mantine/core/styles.css';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import Navigation from '@/components/Navigation';
 
 export default function RootLayout({
   children,
@@ -29,12 +30,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
       <body className="min-h-full flex flex-col">
         <MantineProvider defaultColorScheme="dark">
+          <Navigation />
           {children}
         </MantineProvider>
       </body>

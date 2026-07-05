@@ -1,0 +1,102 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "../src/generated/prisma"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resumes   Resume[]
+  targetRoles TargetRole[]
+}
+
+model Resume {
+  id             String               @id @default(uuid())
+  userId         String
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content        String
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  
+  jobDescriptions JobDescription[]
+  identity        EngineeringIdentity?
+  skillGaps       SkillGap[]
+  readiness       ReadinessAnalysis[]
+}
+
+model JobDescription {
+  id          String   @id @default(uuid())
+  resumeId    String
+  resume      Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  content     String
+  matchScore  Float?
+  createdAt   DateTime @default(now())
+}
+
+model EngineeringIdentity {
+  id          String         @id @default(uuid())
+  resumeId    String         @unique
+  resume      Resume         @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  archetype   String
+  level       String
+  coreDomains String[]
+  projects    Json?
+  timeline    Json?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  evidence    EvidenceNode[]
+}
+
+model EvidenceNode {
+  id         String              @id @default(uuid())
+  identityId String
+  identity   EngineeringIdentity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  domain     String
+  skill      String
+  snippet    String
+  offsetStart Int?
+  offsetEnd   Int?
+}
+
+model TargetRole {
+  id          String     @id @default(uuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  createdAt   DateTime   @default(now())
+  skillGaps   SkillGap[]
+  readiness   ReadinessAnalysis[]
+}
+
+model SkillGap {
+  id           String     @id @default(uuid())
+  resumeId     String
+  resume       Resume     @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  targetRoleId String
+  targetRole   TargetRole @relation(fields: [targetRoleId], references: [id], onDelete: Cascade)
+  missingSkill String
+  importance   String
+  createdAt    DateTime   @default(now())
+}
+
+model ReadinessAnalysis {
+  id           String     @id @default(uuid())
+  resumeId     String
+  resume       Resume     @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  targetRoleId String
+  targetRole   TargetRole @relation(fields: [targetRoleId], references: [id], onDelete: Cascade)
+  riskMap      Json
+  treeNodes    Json
+  treeEdges    Json
+  createdAt    DateTime   @default(now())
+}

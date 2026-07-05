@@ -4,6 +4,7 @@ import { ScoringService } from '../services/scoring.service';
 import { KeywordService } from '../services/keyword.service';
 import { GeminiService } from '../services/gemini.service';
 import { analyzeRequestSchema } from '../validators/ats.validator';
+import { prisma } from '../lib/prisma';
 
 const parserService = new ParserService();
 const scoringService = new ScoringService();
@@ -21,9 +22,27 @@ export class AtsController {
       const { buffer, mimetype } = req.file;
       const parsedResume = await parserService.parseFile(buffer, mimetype);
 
+      // Fetch or create a dummy user since there's no auth yet
+      let user = await prisma.user.findFirst();
+      if (!user) {
+        user = await prisma.user.create({
+          data: { email: 'test@example.com', name: 'Test User' }
+        });
+      }
+
+      const savedResume = await prisma.resume.create({
+        data: {
+          userId: user.id,
+          content: parsedResume.rawText,
+        }
+      });
+
       res.status(200).json({
         success: true,
-        data: parsedResume,
+        data: {
+          ...parsedResume,
+          resumeId: savedResume.id
+        },
       });
     } catch (error: unknown) {
       console.error('Upload Error:', error);

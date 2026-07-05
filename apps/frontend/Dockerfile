@@ -3,12 +3,15 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm config set fetch-retry-maxtimeout 600000 && npm config set fetch-retry-mintimeout 100000 && npm install --network-timeout=1000000
 
 COPY . .
 
 # Next.js telemetry disable
 ENV NEXT_TELEMETRY_DISABLED 1
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 RUN npm run build
 

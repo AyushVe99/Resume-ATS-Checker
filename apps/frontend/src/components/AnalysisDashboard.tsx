@@ -1,6 +1,6 @@
 'use client';
 
-import { useAtsStore } from '../../store/ats';
+import { useMatchStore } from '../../store/match';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CheckCircle2, AlertTriangle, Lightbulb, Zap, ArrowLeft, ChevronDown, ChevronUp, Target, TrendingUp } from 'lucide-react';
@@ -77,12 +77,12 @@ const CategoryAccordion = ({ title, data }: { title: string, data: any }) => {
 };
 
 export default function AnalysisDashboard() {
-  const analysisResult = useAtsStore((state) => state.analysisResult);
+  const analysisResult = useMatchStore((state) => state.analysisResult);
   const router = useRouter();
 
   useEffect(() => {
     if (!analysisResult) {
-      router.push('/upload');
+      router.push('/match');
       return;
     }
   }, [analysisResult, router]);
@@ -111,15 +111,51 @@ export default function AnalysisDashboard() {
     return 'text-red-400 bg-red-400/10 border-red-400/20';
   };
 
+  const topDeductions = Object.values(categories as Record<string, any>)
+    .flatMap(cat => cat.deductions)
+    .sort((a: any, b: any) => b.points - a.points)
+    .slice(0, 3);
+
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
-        <button onClick={() => router.push('/upload')} className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors">
+        <button onClick={() => { useMatchStore.getState().setAnalysisResult(null); router.push('/match'); }} className="p-2 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-3xl font-bold">Analysis Results</h1>
       </div>
+
+      {topDeductions.length > 0 && (
+        <div className="bg-gradient-to-r from-orange-900/20 to-red-900/20 border border-orange-500/20 rounded-2xl p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="w-6 h-6 text-orange-400" />
+            <h3 className="font-bold text-xl text-orange-100">Action Plan: Quick Fixes</h3>
+          </div>
+          <p className="text-gray-400 text-sm mb-4">Do these 3 things right now to immediately boost your ATS Match Score:</p>
+          <ul className="space-y-4">
+            {topDeductions.map((deduction: any, idx: number) => (
+              <li key={idx} className="bg-gray-900/50 p-4 rounded-lg border border-gray-800 flex gap-4 items-start">
+                <div className="w-8 h-8 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold flex-shrink-0">
+                  {idx + 1}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-bold text-gray-200">{deduction.rule}</span>
+                    <span className="text-xs bg-red-500/10 text-red-400 px-2 py-0.5 rounded font-bold">
+                      +{deduction.points} pts
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-2">{deduction.explanation}</p>
+                  <p className="text-sm text-blue-400 font-medium flex items-center gap-2">
+                    <Lightbulb className="w-4 h-4" /> {deduction.recommendation}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Left Column: High Level Scores */}
