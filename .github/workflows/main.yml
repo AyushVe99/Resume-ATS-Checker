@@ -31,7 +31,8 @@ jobs:
           NEXT_PUBLIC_API_URL: http://localhost:5000/api
 
       - name: Generate Prisma Client
-        run: npx prisma generate --schema=apps/backend/prisma/schema.prisma
+        working-directory: apps/backend
+        run: npx prisma generate
 
       - name: Build Backend
         run: npm run build --workspace=apps/backend
