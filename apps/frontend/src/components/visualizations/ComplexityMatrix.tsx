@@ -2,7 +2,6 @@
 
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from 'recharts';
 
-import { TooltipProps } from 'recharts';
 
 interface MatrixData {
   name: string;

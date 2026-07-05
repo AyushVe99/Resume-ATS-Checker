@@ -74,7 +74,7 @@ export default function EngineeringDNA({ data }: { data: EngineeringData }) {
     svg.selectAll('*').remove();
 
     const simulation = d3.forceSimulation(graphData.nodes)
-      .force('link', d3.forceLink(graphData.links).id((d: any) => d.id).distance(100))
+      .force('link', d3.forceLink(graphData.links).id((d: d3.SimulationNodeDatum) => (d as D3Node).id).distance(100))
       .force('charge', d3.forceManyBody().strength(-400))
       .force('x', d3.forceX())
       .force('y', d3.forceY());
@@ -124,6 +124,7 @@ export default function EngineeringDNA({ data }: { data: EngineeringData }) {
         d.fy = null;
       });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     node.call(drag as any);
 
     simulation.on('tick', () => {

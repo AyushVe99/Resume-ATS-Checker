@@ -72,7 +72,7 @@ export default function ReadinessTree({ data }: { data: TreeData }) {
     setEdges(formattedEdges);
   }, [data, setNodes, setEdges]);
 
-  const onConnect = useCallback((params: unknown) => setEdges((eds) => addEdge(params as any, eds)), [setEdges]);
+  const onConnect = useCallback((params: unknown) => setEdges((eds) => addEdge(params as import('@xyflow/react').Connection, eds)), [setEdges]);
 
   return (
     <div className="w-full h-[500px] bg-gray-900/50 border border-gray-800 rounded-3xl overflow-hidden shadow-2xl relative">

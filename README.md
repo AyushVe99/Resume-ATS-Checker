@@ -12,6 +12,13 @@ The architecture of this project strictly follows a **Deterministic Engine First
 4. **Recruiter Confidence Simulator**: Calculates a separate, secondary 100-point metric simulating how a human recruiter would perceive the candidate based purely on impact metrics, technical match, and leadership signals (ignoring ATS mechanics).
 5. **AI Suggestions**: Google Gemini operates entirely in parallel to analyze grammar and rewrite bullets. It has **no** influence over the ATS score or Recruiter Confidence score.
 
+## Key Features
+
+- **Advanced Data Visualizations**: Actionable insights generated through Engineering DNA diagrams, Complexity vs Impact matrices, Risk Maps, and Readiness Trees built with d3 and React Flow.
+- **Action Plan Dashboard**: Prioritizes the top 3 highest-impact fixes a user can make to their resume to boost their score immediately.
+- **Multi-API Key Load Balancing**: The backend accepts a comma-separated list of Gemini API keys, automatically distributing requests to avoid rate limits.
+- **Automated CI/CD**: A unified GitHub Actions pipeline automatically lints, builds, tests, and triggers deployments to Render (Backend) and Vercel (Frontend) upon pushing to the `main` branch.
+
 ## Architecture & Tech Stack
 
 This project is a Monorepo managed via npm workspaces.
@@ -37,10 +44,11 @@ This project is a Monorepo managed via npm workspaces.
    npm install
    ```
 3. **Set up Environment Variables**:
-   Create an `.env` file in `apps/backend/.env`:
+   Create an `.env` file in `apps/backend/.env`. You can provide multiple API keys separated by commas for load balancing:
    ```env
    PORT=5000
-   GEMINI_API_KEY=your_google_gemini_api_key_here
+   GEMINI_API_KEY=your_key_1,your_key_2,your_key_3
+   DATABASE_URL=postgresql://user:pass@host:5432/db
    ```
 4. **Run the Application**:
    You can start both frontend and backend concurrently from the root directory:
@@ -69,6 +77,17 @@ The backend is fully verified with a 100% test pass rate using Jest. To run the 
 cd apps/backend
 npm test
 ```
+
+## CI/CD Pipeline & Deployment
+
+This repository includes a robust GitHub Actions CI/CD pipeline (`.github/workflows/main.yml`) that triggers on any push or PR to `main`. 
+
+The pipeline:
+1. **CI Phase**: Runs `npm ci`, enforces strict ESLint rules, builds the Next.js frontend, and verifies backend functionality with Jest.
+2. **CD Phase (Backend)**: If the CI phase passes, triggers an automated deployment to Render via a secure webhook hook (`RENDER_DEPLOY_HOOK_URL`).
+3. **CD Phase (Frontend)**: Vercel automatically deploys the frontend directly from the GitHub repository `main` branch when it updates.
+
+To set this up, add `RENDER_DEPLOY_HOOK_URL` to your GitHub Repository Secrets.
 
 ## Contributing
 Follow the standard PR process. Ensure that any additions to the ATS scoring logic remain 100% deterministic and strictly typed.
