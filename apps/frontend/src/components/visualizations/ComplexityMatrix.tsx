@@ -2,7 +2,21 @@
 
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from 'recharts';
 
-const CustomTooltip = ({ active, payload }: any) => {
+import { TooltipProps } from 'recharts';
+
+interface MatrixData {
+  name: string;
+  domain: string;
+  complexity: number;
+  impact: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: MatrixData }>;
+}
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -19,7 +33,7 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export default function ComplexityMatrix({ data = [] }: { data: any[] }) {
+export default function ComplexityMatrix({ data = [] }: { data: MatrixData[] }) {
   return (
     <div className="w-full h-[500px] bg-gray-900/50 border border-gray-800 rounded-3xl p-6">
       <h3 className="text-xl font-bold mb-6 text-white text-center">Project Complexity vs. Impact Matrix</h3>
@@ -47,7 +61,7 @@ export default function ComplexityMatrix({ data = [] }: { data: any[] }) {
           <ZAxis type="category" dataKey="name" name="Project" />
           <Tooltip cursor={{ strokeDasharray: '3 3', stroke: '#6b7280' }} content={<CustomTooltip />} />
           <Scatter name="Projects" data={data} fill="var(--accent-primary)">
-            {data.map((entry: any, index: number) => (
+            {data.map((entry: MatrixData, index: number) => (
               <circle 
                 key={`cell-${index}`} 
                 cx={0} 

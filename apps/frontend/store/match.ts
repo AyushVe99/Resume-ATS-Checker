@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
 interface MatchState {
-  analysisResult: any | null;
+  analysisResult: Record<string, unknown> | null;
   isAnalyzing: boolean;
-  setAnalysisResult: (result: any) => void;
+  setAnalysisResult: (result: Record<string, unknown> | null) => void;
   setIsAnalyzing: (analyzing: boolean) => void;
 }
 

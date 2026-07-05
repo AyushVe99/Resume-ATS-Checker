@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
 interface ReadinessState {
-  readinessData: any | null;
+  readinessData: Record<string, unknown> | null;
   isAnalyzingReadiness: boolean;
-  setReadinessData: (data: any) => void;
+  setReadinessData: (data: Record<string, unknown> | null) => void;
   setIsAnalyzingReadiness: (isAnalyzing: boolean) => void;
 }
 

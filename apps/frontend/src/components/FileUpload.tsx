@@ -95,8 +95,8 @@ export default function FileUpload() {
     
     setLoadingMessage('Mapping keywords against JD...');
     
-    let timer1 = setTimeout(() => { setLoadingMessage('Evaluating Recruiter Confidence...'); }, 2000);
-    let timer2 = setTimeout(() => { setLoadingMessage('Generating Gemini AI suggestions...'); }, 4500);
+    const timer1 = setTimeout(() => { setLoadingMessage('Evaluating Recruiter Confidence...'); }, 2000);
+    const timer2 = setTimeout(() => { setLoadingMessage('Generating Gemini AI suggestions...'); }, 4500);
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';

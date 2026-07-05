@@ -3,7 +3,15 @@
 import { motion } from 'framer-motion';
 import { Briefcase } from 'lucide-react';
 
-export default function EvidenceTimeline({ data = [] }: { data: any[] }) {
+interface TimelineItem {
+  role: string;
+  company: string;
+  year: string;
+  domain: string;
+  achievement: string;
+}
+
+export default function EvidenceTimeline({ data = [] }: { data: TimelineItem[] }) {
   return (
     <div className="w-full max-w-3xl mx-auto py-12">
       <h3 className="text-3xl font-extrabold text-center mb-16 text-white tracking-tight">Career Evidence Timeline</h3>
@@ -42,7 +50,7 @@ export default function EvidenceTimeline({ data = [] }: { data: any[] }) {
                 </div>
               </div>
               <p className="text-gray-300 leading-relaxed">
-                "{item.achievement}"
+                &quot;{item.achievement}&quot;
               </p>
             </div>
           </motion.div>

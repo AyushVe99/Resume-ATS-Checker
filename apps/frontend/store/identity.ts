@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
 interface IdentityState {
-  identityData: any | null;
+  identityData: Record<string, unknown> | null;
   isAnalyzingIdentity: boolean;
-  setIdentityData: (data: any) => void;
+  setIdentityData: (data: Record<string, unknown>) => void;
   setIsAnalyzingIdentity: (isAnalyzing: boolean) => void;
 }
 

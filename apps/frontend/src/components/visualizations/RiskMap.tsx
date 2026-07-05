@@ -2,7 +2,14 @@
 
 import { motion } from 'framer-motion';
 
-export default function RiskMap({ data = [] }: { data: any[] }) {
+interface RiskItem {
+  skill: string;
+  risk: string;
+  proficiency: number;
+  required?: boolean;
+}
+
+export default function RiskMap({ data = [] }: { data: RiskItem[] }) {
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case 'Low': return 'bg-green-500/20 border-green-500/40 text-green-400';

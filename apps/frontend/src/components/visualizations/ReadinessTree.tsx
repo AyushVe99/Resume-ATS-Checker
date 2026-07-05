@@ -16,7 +16,23 @@ import {
 import '@xyflow/react/dist/style.css';
 import { useEffect } from 'react';
 
-export default function ReadinessTree({ data }: { data: any }) {
+interface TreeNode {
+  id: string;
+  label: string;
+  type: string;
+}
+
+interface TreeEdge {
+  source: string;
+  target: string;
+}
+
+interface TreeData {
+  treeNodes?: TreeNode[];
+  treeEdges?: TreeEdge[];
+}
+
+export default function ReadinessTree({ data }: { data: TreeData }) {
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
@@ -24,7 +40,7 @@ export default function ReadinessTree({ data }: { data: any }) {
     if (!data?.treeNodes) return;
     
     // Convert API nodes to React Flow format
-    const formattedNodes = data.treeNodes.map((n: any, idx: number) => {
+    const formattedNodes = data.treeNodes.map((n: TreeNode, idx: number) => {
       let bg = '#374151', color = 'white', border = '1px solid #4b5563';
       let y = 150, x = 100 + (idx * 150);
 
@@ -44,7 +60,7 @@ export default function ReadinessTree({ data }: { data: any }) {
       };
     });
 
-    const formattedEdges = (data.treeEdges || []).map((e: any, idx: number) => ({
+    const formattedEdges = (data.treeEdges || []).map((e: TreeEdge, idx: number) => ({
       id: `e${e.source}-${e.target}-${idx}`,
       source: e.source,
       target: e.target,
@@ -56,7 +72,7 @@ export default function ReadinessTree({ data }: { data: any }) {
     setEdges(formattedEdges);
   }, [data, setNodes, setEdges]);
 
-  const onConnect = useCallback((params: any) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback((params: unknown) => setEdges((eds) => addEdge(params as any, eds)), [setEdges]);
 
   return (
     <div className="w-full h-[500px] bg-gray-900/50 border border-gray-800 rounded-3xl overflow-hidden shadow-2xl relative">

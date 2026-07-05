@@ -3,15 +3,39 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
-export default function EngineeringDNA({ data }: { data: any }) {
+interface Evidence {
+  skill: string;
+  domain?: string;
+}
+
+interface EngineeringData {
+  archetype: string;
+  coreDomains?: string[];
+  evidence?: Evidence[];
+}
+
+interface D3Node extends d3.SimulationNodeDatum {
+  id: string;
+  group: number;
+  radius: number;
+  color: string;
+}
+
+interface D3Link extends d3.SimulationLinkDatum<D3Node> {
+  source: string | D3Node;
+  target: string | D3Node;
+  value: number;
+}
+
+export default function EngineeringDNA({ data }: { data: EngineeringData }) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (!svgRef.current || !data) return;
 
     // Transform AI identity data into d3 nodes/links
-    const nodes: any[] = [];
-    const links: any[] = [];
+    const nodes: D3Node[] = [];
+    const links: D3Link[] = [];
     
     // Core Archetype Node
     nodes.push({ id: data.archetype, group: 0, radius: 40, color: 'var(--accent-primary)' });
@@ -24,17 +48,17 @@ export default function EngineeringDNA({ data }: { data: any }) {
 
     // Skill Nodes (from evidence)
     const processedSkills = new Set<string>();
-    data.evidence?.forEach((ev: any) => {
+    data.evidence?.forEach((ev: Evidence) => {
       if (!processedSkills.has(ev.skill)) {
         nodes.push({ id: ev.skill, group: 2, radius: 20, color: 'var(--accent-secondary)' });
-        links.push({ source: ev.domain || data.coreDomains[0], target: ev.skill, value: 2 });
+        links.push({ source: ev.domain || (data.coreDomains ? data.coreDomains[0] : data.archetype), target: ev.skill, value: 2 });
         processedSkills.add(ev.skill);
       }
     });
 
     // Filter invalid links where source or target doesn't exist
     const nodeIds = new Set(nodes.map(n => n.id));
-    const validLinks = links.filter(l => nodeIds.has(l.source) && nodeIds.has(l.target));
+    const validLinks = links.filter(l => nodeIds.has(l.source as string) && nodeIds.has(l.target as string));
 
     const width = 600;
     const height = 600;
@@ -61,7 +85,7 @@ export default function EngineeringDNA({ data }: { data: any }) {
       .selectAll('line')
       .data(graphData.links)
       .join('line')
-      .attr('stroke-width', (d: any) => Math.sqrt(d.value));
+      .attr('stroke-width', (d) => Math.sqrt(d.value));
 
     const node = svg.append('g')
       .attr('stroke', '#fff')
@@ -69,22 +93,22 @@ export default function EngineeringDNA({ data }: { data: any }) {
       .selectAll('circle')
       .data(graphData.nodes)
       .join('circle')
-      .attr('r', (d: any) => d.radius)
-      .attr('fill', (d: any) => d.color);
+      .attr('r', (d) => d.radius)
+      .attr('fill', (d) => d.color);
 
     const label = svg.append('g')
       .selectAll('text')
       .data(graphData.nodes)
       .join('text')
-      .text((d: any) => d.id)
+      .text((d) => d.id)
       .attr('font-size', '12px')
       .attr('font-weight', 'bold')
       .attr('fill', '#fff')
       .attr('text-anchor', 'middle')
-      .attr('dy', (d: any) => d.radius + 15);
+      .attr('dy', (d) => d.radius + 15);
 
     // Add drag behavior
-    const drag = d3.drag<SVGCircleElement, any>()
+    const drag = d3.drag<SVGCircleElement, D3Node>()
       .on('start', (event, d) => {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -104,18 +128,18 @@ export default function EngineeringDNA({ data }: { data: any }) {
 
     simulation.on('tick', () => {
       link
-        .attr('x1', (d: any) => d.source.x)
-        .attr('y1', (d: any) => d.source.y)
-        .attr('x2', (d: any) => d.target.x)
-        .attr('y2', (d: any) => d.target.y);
+        .attr('x1', (d) => (d.source as D3Node).x || 0)
+        .attr('y1', (d) => (d.source as D3Node).y || 0)
+        .attr('x2', (d) => (d.target as D3Node).x || 0)
+        .attr('y2', (d) => (d.target as D3Node).y || 0);
 
       node
-        .attr('cx', (d: any) => d.x)
-        .attr('cy', (d: any) => d.y);
+        .attr('cx', (d) => d.x || 0)
+        .attr('cy', (d) => d.y || 0);
 
       label
-        .attr('x', (d: any) => d.x)
-        .attr('y', (d: any) => d.y);
+        .attr('x', (d) => d.x || 0)
+        .attr('y', (d) => d.y || 0);
     });
 
     return () => {
