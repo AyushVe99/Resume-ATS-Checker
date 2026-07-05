@@ -17,7 +17,7 @@ export default function EngineeringDNA({ data }: { data: any }) {
     nodes.push({ id: data.archetype, group: 0, radius: 40, color: 'var(--accent-primary)' });
 
     // Domain Nodes
-    data.coreDomains?.forEach((domain: string, idx: number) => {
+    data.coreDomains?.forEach((domain: string) => {
       nodes.push({ id: domain, group: 1, radius: 30, color: '#3b82f6' });
       links.push({ source: data.archetype, target: domain, value: 3 });
     });
@@ -121,7 +121,7 @@ export default function EngineeringDNA({ data }: { data: any }) {
     return () => {
       simulation.stop();
     };
-  }, []);
+  }, [data]);
 
   return (
     <div className="flex justify-center items-center p-8 bg-gray-900/50 border border-gray-800 rounded-3xl w-full">

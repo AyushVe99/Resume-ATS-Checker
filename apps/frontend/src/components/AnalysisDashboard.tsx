@@ -15,7 +15,22 @@ const getSeverityColor = (severity: string) => {
   }
 };
 
-const CategoryAccordion = ({ title, data }: { title: string, data: any }) => {
+interface Deduction {
+  rule: string;
+  points: number;
+  severity: string;
+  explanation: string;
+  recommendation: string;
+}
+
+interface CategoryData {
+  score: number;
+  maxPoints: number;
+  percentage: number;
+  deductions: Deduction[];
+}
+
+const CategoryAccordion = ({ title, data }: { title: string, data: CategoryData }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -49,7 +64,7 @@ const CategoryAccordion = ({ title, data }: { title: string, data: any }) => {
               {data.deductions.length > 0 ? (
                 <div className="space-y-3">
                   <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Points Lost</h4>
-                  {data.deductions.map((deduction: any, idx: number) => (
+                  {data.deductions.map((deduction: Deduction, idx: number) => (
                     <div key={idx} className={`p-4 rounded-lg border ${getSeverityColor(deduction.severity)}`}>
                       <div className="flex justify-between items-start mb-2">
                         <span className="font-bold">{deduction.rule}</span>
@@ -111,9 +126,9 @@ export default function AnalysisDashboard() {
     return 'text-red-400 bg-red-400/10 border-red-400/20';
   };
 
-  const topDeductions = Object.values(categories as Record<string, any>)
+  const topDeductions = Object.values(categories as Record<string, CategoryData>)
     .flatMap(cat => cat.deductions)
-    .sort((a: any, b: any) => b.points - a.points)
+    .sort((a: Deduction, b: Deduction) => b.points - a.points)
     .slice(0, 3);
 
   return (
@@ -134,7 +149,7 @@ export default function AnalysisDashboard() {
           </div>
           <p className="text-gray-400 text-sm mb-4">Do these 3 things right now to immediately boost your ATS Match Score:</p>
           <ul className="space-y-4">
-            {topDeductions.map((deduction: any, idx: number) => (
+            {topDeductions.map((deduction: Deduction, idx: number) => (
               <li key={idx} className="bg-gray-900/50 p-4 rounded-lg border border-gray-800 flex gap-4 items-start">
                 <div className="w-8 h-8 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold flex-shrink-0">
                   {idx + 1}
@@ -272,7 +287,7 @@ export default function AnalysisDashboard() {
             <h3 className="font-bold text-xl mb-4">Detailed Score Deductions</h3>
             <p className="text-gray-400 text-sm mb-6">Click on any category to view specific recruiter feedback and rules triggered.</p>
             
-            {Object.entries(categories as Record<string, any>).map(([key, data]) => (
+            {Object.entries(categories as Record<string, CategoryData>).map(([key, data]) => (
               <CategoryAccordion key={key} title={key} data={data} />
             ))}
           </div>

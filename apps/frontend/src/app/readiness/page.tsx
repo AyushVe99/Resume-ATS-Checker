@@ -58,7 +58,7 @@ export default function ReadinessPage() {
       <div className="flex-1 flex flex-col items-center justify-center p-8 bg-black text-white min-h-[80vh]">
         <h1 className="text-5xl font-extrabold mb-6 tracking-tight">Target <span className="text-[var(--accent-secondary)]">Role</span></h1>
         <p className="text-gray-400 max-w-xl text-center mb-12 text-lg">
-          Enter the aspirational role you are aiming for (e.g., "Staff Machine Learning Engineer"). We will map your exact skill gaps and build a roadmap.
+          Enter the aspirational role you are aiming for (e.g., &quot;Staff Machine Learning Engineer&quot;). We will map your exact skill gaps and build a roadmap.
         </p>
         
         <div className="flex w-full max-w-lg gap-4 bg-gray-900/50 p-2 rounded-2xl border border-gray-800">

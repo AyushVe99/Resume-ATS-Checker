@@ -13,12 +13,23 @@ interface FormValues {
   jobDescription: string;
 }
 
+interface ParsedData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  skills?: unknown[];
+  experience?: unknown[];
+  projects?: unknown[];
+  education?: unknown[];
+  [key: string]: unknown;
+}
+
 export default function FileUpload() {
   const router = useRouter();
   const setAnalysisResult = useMatchStore((state) => state.setAnalysisResult);
   const setIsAnalyzing = useMatchStore((state) => state.setIsAnalyzing);
   const [step, setStep] = useState<'upload' | 'verify'>('upload');
-  const [parsedData, setParsedData] = useState<any>(null);
+  const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [uploading, setUploading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState<string>('');
   const [serverError, setServerError] = useState<string | null>(null);
