@@ -77,7 +77,7 @@ export default function Home() {
             </span>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">The Future of Hiring</h2>
             <p className="text-xl text-[var(--foreground)] opacity-70 max-w-2xl text-center font-light">
-              We are building the ultimate automated career copilot. Here's what's coming next to our platform.
+              We are building the ultimate automated career copilot. Here&apos;s what&apos;s coming next to our platform.
             </p>
           </div>
 
