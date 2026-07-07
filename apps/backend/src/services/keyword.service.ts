@@ -146,7 +146,8 @@ export class KeywordService {
       
       for (const [key, aliases] of Object.entries(this.dictionary)) {
         for (const alias of aliases) {
-          const regex = new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\b`, 'i');
+          const escapedAlias = alias.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+          const regex = new RegExp(`(^|[^a-zA-Z0-9_])${escapedAlias}([^a-zA-Z0-9_]|$)`, 'i');
           if (regex.test(line)) {
             if (currentMode === 'required') requiredSkillsSet.add(key);
             else if (currentMode === 'preferred') preferredSkillsSet.add(key);
