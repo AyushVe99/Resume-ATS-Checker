@@ -61,8 +61,10 @@ export class GeminiService {
   }
 
   public async getSuggestions(resume: ParsedResume): Promise<AISuggestion[]> {
+    const currentYear = new Date().getFullYear();
     const prompt = `
       You are an expert ATS Resume Reviewer.
+      The current year is ${currentYear}. Do not flag employment dates in or before ${currentYear} as future dates or factual errors.
       Review the following resume data strictly for grammar, readability, and bullet improvements.
       Provide 3-5 suggestions for improvement.
       Format the output as a valid JSON array of objects with this schema:
